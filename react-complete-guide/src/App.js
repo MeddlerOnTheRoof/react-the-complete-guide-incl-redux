@@ -1,49 +1,87 @@
 import React, { Component } from 'react';
 import './App.css';
-import ValidationComponent from './ValidationComponent/ValidationComponent';
-import CharComponent from './CharComponent/CharComponent';
+import Person from './Person/Person';
 
 class App extends Component {
+  // only class based components contain state
+  // try to stay stateless wherever possible
+  // state is a non-optional name
+  // it helps the react component know when to re-render,
+  // based on changes to this property
   state = {
-    userInput: ''
+    persons: [
+      { id: '1', name: 'Max', age: 28 },
+      { id: '2', name: 'Manu', age: 29 },
+      { id: '3', name: 'Stephanie', age: 26 }
+    ],
+    showPersons: false
   }
 
-  changeHandler = (event) => {
-    this.setState({
-      userInput: event.target.value
+  deletePersonHandler = (personIndex) => {
+    const persons = this.state.persons.slice();
+
+    persons.splice(personIndex, 1);
+
+    this.setState({ persons: persons });
+  }
+
+  nameChangedHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
     });
+
+    const person = {
+      ...this.state.persons[personIndex]
+    };
+
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState({ persons: persons });
   }
 
-  charOnClickHandler = (index) => {
-    let chars = [...this.state.userInput];
-
-    chars.splice(index, 1);
-
-    let userInput = chars.join('');
-
+  togglePersonsHandler = (event) => {
     this.setState({
-      userInput: userInput
+      showPersons: !this.state.showPersons
     });
   }
 
   render() {
-    let chars = this.state.userInput.slice().split('');
+    const style = {
+      backgroundColor: 'white',
+      font: 'inherit',
+      border: '1px stolid blue',
+      padding: '8px',
+      cursor: 'pointer'
+    }
 
-    let charComponents = (<div>
-      {
-        chars.map((char, index) => {
-          return <CharComponent key={index} char={char} click={() => this.charOnClickHandler(index)} />
-        })
-      }
-    </div>);
+    let persons = null;
 
+    if (this.state.showPersons) {
+      persons = (
+        <div>
+          {this.state.persons.map((person, index) => {
+            return <Person
+              click={() => this.deletePersonHandler(index)}
+              name={person.name}
+              age={person.age}
+              key={person.id}
+              changed={(event) => this.nameChangedHandler(event, person.id)}></Person>
+          })}
+        </div>
+      );
+    }
 
     return (
       <div className="App">
-        <input onChange={(event) => this.changeHandler(event)} value={this.state.userInput}></input>
-        <ValidationComponent inputLength={this.state.userInput.length} />
-        {charComponents}
-        <p>{this.state.userInput}</p>
+        <h1>Hi, I'm a React App</h1>
+        <p>This is really working!</p>
+        <button
+          style={style}
+          onClick={this.togglePersonsHandler}>Show Persons</button>
+        {persons}
       </div>
     );
   }
