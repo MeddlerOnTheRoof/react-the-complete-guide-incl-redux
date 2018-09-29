@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+// style root is a named export, needed for wrapping certain styling in Radium
+import Radium, { StyleRoot } from 'radium';
 import Person from './Person/Person';
 
 class App extends Component {
@@ -54,10 +56,17 @@ class App extends Component {
       font: 'inherit',
       border: '1px stolid blue',
       padding: '8px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      color: 'white',
+      backgroundColor: 'green',
+      ':hover': {
+        backgroundColor: 'lightgreen',
+        color: 'black'
+      }
     }
 
     let persons = null;
+    let toggleButton = 'Show Persons';
 
     if (this.state.showPersons) {
       persons = (
@@ -72,19 +81,36 @@ class App extends Component {
           })}
         </div>
       );
+
+      style.backgroundColor = 'red';
+      style[':hover'] = {
+        backgroundColor: 'salmon',
+        color: 'black'
+      };
+      toggleButton = 'Hide Persons';
     }
 
+    const classes = [];
+
+    if (this.state.persons.length <= 2)
+      classes.push('red');
+
+    if (this.state.persons.length <= 1)
+      classes.push('bold');
+
     return (
-      <div className="App">
-        <h1>Hi, I'm a React App</h1>
-        <p>This is really working!</p>
-        <button
-          style={style}
-          onClick={this.togglePersonsHandler}>Show Persons</button>
-        {persons}
-      </div>
+      <StyleRoot>
+        <div className="App">
+          <h1>Hi, I'm a React App</h1>
+          <p className={classes.join(' ')}>This is really working!</p>
+          <button
+            style={style}
+            onClick={this.togglePersonsHandler}>{toggleButton}</button>
+          {persons}
+        </div>
+      </StyleRoot>
     );
   }
 }
 
-export default App;
+export default Radium(App);
